@@ -1,0 +1,701 @@
+JAVA CODE
+
+// (1) CODE TO DISPLAY A WELCOME PAGE WITH THREE SEARCH BUTTONS AND A TITLE ABOVE THE SEARCH BUTTONS
+
+package hospital;
+
+
+import java.awt.EventQueue;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Dimension;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import java.awt.Font;
+import java.awt.SystemColor;
+import java.awt.Toolkit;
+
+@SuppressWarnings("serial")
+public class WelcomePage extends JFrame {
+
+	private JPanel contentPane;
+
+	/**
+	 * Launch the application.
+	 */
+	public static WelcomePage home_frame = new WelcomePage();
+	
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					home_frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public WelcomePage() {
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./src/main/resources/data/images/doctor.png"));
+	//	setIconImage(Toolkit.getDefaultToolkit().getImage("./src/main/hospital/hospital.image/hospitalimage.jpg"));
+		setTitle("Semantic Search");
+		setResizable(false);
+		setPreferredSize(new Dimension(800, 800));
+		setMaximumSize(new Dimension(800, 800));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 700, 700);
+		contentPane = new JPanel();
+		contentPane.setPreferredSize(new Dimension(700, 700));
+		contentPane.setMaximumSize(new Dimension(400, 400));
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		
+	
+		JButton btnSearchPatient = new JButton("Search patient");
+		btnSearchPatient.setBackground(SystemColor.controlHighlight);
+		btnSearchPatient.setFocusable(false);
+		btnSearchPatient.setFocusTraversalKeysEnabled(false);
+		btnSearchPatient.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		btnSearchPatient.setBounds(173, 354, 350, 45);
+		btnSearchPatient.setFocusPainted(false);
+		btnSearchPatient.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new SearchPatient().setVisible(true);
+				WelcomePage.home_frame.setVisible(false);
+			}
+		});
+		contentPane.setLayout(null);
+		
+		JLabel lblPatientAndDoctorAndFacility = new JLabel("");
+		lblPatientAndDoctorAndFacility.setBounds(50, 10, 620, 620);
+		lblPatientAndDoctorAndFacility.setRequestFocusEnabled(false);
+		lblPatientAndDoctorAndFacility.setIcon(new ImageIcon("./src/main/resources/data/images/doctor.png"));
+		lblPatientAndDoctorAndFacility.setPreferredSize(new Dimension(225, 225));
+		contentPane.add(lblPatientAndDoctorAndFacility);
+		btnSearchPatient.setPreferredSize(new Dimension(170, 45));
+		contentPane.add(btnSearchPatient);
+		
+		JButton btnSearchDoctor = new JButton("Search Doctor");
+		btnSearchDoctor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new SearchDoctor().setVisible(true);
+				WelcomePage.home_frame.setVisible(false);
+			}
+		});
+		btnSearchDoctor.setFocusTraversalKeysEnabled(false);
+		btnSearchDoctor.setFocusPainted(false);
+		btnSearchDoctor.setBackground(SystemColor.controlHighlight);
+		btnSearchDoctor.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		btnSearchDoctor.setBounds(173, 280, 350, 45);
+		btnSearchDoctor.setPreferredSize(new Dimension(350, 45));
+		contentPane.add(btnSearchDoctor);
+		
+		JButton btnSearchFacility = new JButton("Search Facility");
+		btnSearchFacility.setBounds(173, 540, 350, 45);
+		btnSearchFacility.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new SearchFacility().setVisible(true);
+				WelcomePage.home_frame.setVisible(false);
+			}
+		});
+		btnSearchFacility.setFocusTraversalKeysEnabled(false);
+		btnSearchFacility.setFocusPainted(false);
+		btnSearchFacility.setBackground(SystemColor.controlHighlight);
+		btnSearchFacility.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		btnSearchFacility.setBounds(173, 440, 350, 45);
+		btnSearchFacility.setPreferredSize(new Dimension(350, 45));
+		contentPane.add(btnSearchFacility);
+		
+		JLabel lblPatientAndDoctorAndFacility_1 = new JLabel("Welcome to Hospital");
+		lblPatientAndDoctorAndFacility_1.setFont(new Font("Sitka Small", Font.BOLD, 31));
+		lblPatientAndDoctorAndFacility_1.setBounds(106, 180, 500, 45);
+		contentPane.add(lblPatientAndDoctorAndFacility_1);
+	}
+}
+
+
+
+
+
+
+// (2) THIS CODE DISPLAY THE PATIENT SEARCH BUTTON
+//      THEREBY ALLOWING INFORMATION ABOUT PATIENT TO BE RETRIEVED
+
+package hospital;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.util.FileManager;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDFS;
+
+import places.SearchPeople;
+
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.Dimension;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import java.awt.Font;
+import java.awt.SystemColor;
+import java.awt.Color;
+import java.awt.Toolkit;
+import java.awt.Button;
+import javax.swing.UIManager;
+import javax.swing.JTextField;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
+
+@SuppressWarnings("serial")
+public class SearchPatient  extends JFrame{
+	// Directory where we've stored the local data files, such as places.owl
+    public static final String SOURCE = "./src/main/resources/data/";
+
+    // Places ontology namespace
+    public static final String PLACES_NS = "http://www.semanticweb.org/myontology#";
+    
+	private JPanel contentPane;
+	
+	//private ArrayList<String> arr = new ArrayList<String>();
+	
+    DefaultListModel listModel = new DefaultListModel();
+
+	/**
+	 * Launch the application.
+	 */
+	
+	public static SearchPatient patient_frame = new SearchPatient();
+	private JTextField txtByName;
+
+	public static void main(String[] args) {
+		
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					patient_frame.setVisible(true);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	
+	public SearchPatient() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setFont(new Font("Arial", Font.PLAIN, 14));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./src/main/resources/images/semantic.png"));
+		setTitle("Semantic Search");
+		setResizable(false);
+		setPreferredSize(new Dimension(800, 800));
+		setMaximumSize(new Dimension(800, 800));
+		setBounds(100, 100, 700, 700);
+		contentPane = new JPanel();
+		contentPane.setPreferredSize(new Dimension(700, 700));
+		contentPane.setMaximumSize(new Dimension(400, 400));
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		
+		
+		JButton btnSearchPatient = new JButton("Search");
+		btnSearchPatient.setBackground(SystemColor.controlHighlight);
+		btnSearchPatient.setFocusable(false);
+		btnSearchPatient.setFocusTraversalKeysEnabled(false);
+		btnSearchPatient.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		btnSearchPatient.setBounds(456, 177, 140, 51);
+		btnSearchPatient.setFocusPainted(false);
+		btnSearchPatient.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String fname = txtByName.getText().toString().toLowerCase();
+				//create instance of OntModel class
+				OntModel m = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM );
+				
+				//read ontology model
+				FileManager.get().readModel( m, SOURCE + "ASSIGNMENT1.owl" );
+				
+				String prefix = "prefix hos: <" + PLACES_NS + ">\n" +
+		                		"prefix rdfs: <" + RDFS.getURI() + ">\n" +
+		                		"prefix owl: <" + OWL.getURI() + ">\n";
+
+				String query_text=  prefix +
+							"select ?fname ?lname where {?x a hos:patient.  " +
+							"                     ?x hos:First_name ?fname.\n"+
+				 								"?x hos:Last_name ?lname.\n";
+				
+				if(fname  != null && !fname.isEmpty()) {
+						query_text += "FILTER(regex(str(?fname),\""+fname+"\",\"i\")) ";
+				}
+				query_text +=	"}" ; 
+				System.out.println(query_text);
+				
+				Query query = QueryFactory.create( query_text );
+		        QueryExecution qexec = QueryExecutionFactory.create( query, m );
+		    	
+		        listModel.removeAllElements();
+		        try {
+		            ResultSet results = qexec.execSelect();
+		            int i = 0;
+		            while ( results.hasNext() ) {
+		                QuerySolution qs = results.next();
+		               // arr.add(qs.get("fname").toString());
+		                listModel.addElement(qs.get("fname").toString()+", "+qs.get("lname").toString());
+		                System.out.println(qs.get("fname"));
+		                i++;
+		            }
+		          if(i == 0) {
+		        	  listModel.addElement("There was no match found for '"+fname+"'");
+		          }
+		            //Create List
+		    		JList list = new JList();
+		    		list.setForeground(Color.DARK_GRAY);
+		    		list.setFont(new Font("Tempus Sans ITC", Font.PLAIN, 18));
+		    		list.setBackground(Color.WHITE);
+		    		list.setBounds(60, 250, 570, 317);
+		    		list.setModel(listModel);
+		    		list.setSelectedIndex(-1);
+		            contentPane.add(list);
+		            contentPane.repaint();
+		        }
+		        finally {
+		            qexec.close();
+		        }
+
+			}
+		});
+		contentPane.setLayout(null);
+		btnSearchPatient.setPreferredSize(new Dimension(350, 45));
+		contentPane.add(btnSearchPatient);
+		
+		JLabel lblPatientAndPlaces_1 = new JLabel("Search Patient");
+		lblPatientAndPlaces_1.setForeground(new Color(0, 128, 128));
+		lblPatientAndPlaces_1.setFont(new Font("Sitka Small", Font.BOLD, 31));
+		lblPatientAndPlaces_1.setBounds(212, 106, 270, 45);
+		contentPane.add(lblPatientAndPlaces_1);
+		
+		txtByName = new JTextField();
+		txtByName.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		txtByName.setToolTipText("Enter Name");
+		txtByName.setBounds(100, 177, 355, 51);
+		contentPane.add(txtByName);
+		txtByName.setColumns(10);
+		
+		
+	
+		
+	}
+	
+
+}
+
+
+
+
+// (3)  THIS CODE RETRIEVE INFORMATION ABOUT DOCTOR
+
+package hospital;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.util.FileManager;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDFS;
+
+import places.SearchPeople;
+
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.Dimension;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import java.awt.Font;
+import java.awt.SystemColor;
+import java.awt.Color;
+import java.awt.Toolkit;
+import java.awt.Button;
+import javax.swing.UIManager;
+import javax.swing.JTextField;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
+
+@SuppressWarnings("serial")
+public class SearchDoctor  extends JFrame{
+	// Directory where we've stored the local data files, such as places.owl
+    public static final String SOURCE = "./src/main/resources/data/";
+
+    // Places ontology namespace
+    public static final String PLACES_NS = "http://www.semanticweb.org/myontology#";
+    
+	private JPanel contentPane;
+	
+	//private ArrayList<String> arr = new ArrayList<String>();
+	
+    DefaultListModel listModel = new DefaultListModel();
+
+	/**
+	 * Launch the application.
+	 */
+	
+	public static SearchDoctor doctor_frame = new SearchDoctor();
+	private JTextField txtByName;
+
+	public static void main(String[] args) {
+		
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					doctor_frame.setVisible(true);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	
+	public SearchDoctor() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setFont(new Font("Arial", Font.PLAIN, 14));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./src/main/resources/images/semantic.png"));
+		setTitle("Semantic Search");
+		setResizable(false);
+		setPreferredSize(new Dimension(800, 800));
+		setMaximumSize(new Dimension(800, 800));
+		setBounds(100, 100, 700, 700);
+		contentPane = new JPanel();
+		contentPane.setPreferredSize(new Dimension(700, 700));
+		contentPane.setMaximumSize(new Dimension(400, 400));
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		
+		
+		JButton btnSearchDoctor = new JButton("Search");
+		btnSearchDoctor.setBackground(SystemColor.controlHighlight);
+		btnSearchDoctor.setFocusable(false);
+		btnSearchDoctor.setFocusTraversalKeysEnabled(false);
+		btnSearchDoctor.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		btnSearchDoctor.setBounds(456, 177, 140, 51);
+		btnSearchDoctor.setFocusPainted(false);
+		btnSearchDoctor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String fname = txtByName.getText().toString().toLowerCase();
+				//create instance of OntModel class
+				OntModel m = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM );
+				
+				//read ontology model
+				FileManager.get().readModel( m, SOURCE + "ASSIGNMENT1.owl" );
+				
+				String prefix = "prefix hos: <" + PLACES_NS + ">\n" +
+		                		"prefix rdfs: <" + RDFS.getURI() + ">\n" +
+		                		"prefix owl: <" + OWL.getURI() + ">\n";
+
+				String query_text=  prefix +
+							"select ?fname where {?x a hos:doctor.  " +
+							"                     ?x hos:First_name ?fname.\n";
+				
+				if(fname != null && !fname.isEmpty()) {
+						query_text += "FILTER(regex(str(?fname),\""+fname+"\",\"i\")) ";
+				}
+				query_text +=	"}" ; 
+				System.out.println(query_text);
+				
+				Query query = QueryFactory.create( query_text );
+		        QueryExecution qexec = QueryExecutionFactory.create( query, m );
+		    	
+		        listModel.removeAllElements();
+		        try {
+		            ResultSet results = qexec.execSelect();
+		            int i = 0;
+		            while ( results.hasNext() ) {
+		                QuerySolution qs = results.next();
+		               // arr.add(qs.get("fname").toString());
+		                listModel.addElement(qs.get("fname").toString());
+		                System.out.println(qs.get("fname"));
+		                i++;
+		            }
+		          if(i == 0) {
+		        	  listModel.addElement("There was no match found for '"+fname+"'");
+		          }
+		            //Create List
+		    		JList list = new JList();
+		    		list.setForeground(Color.DARK_GRAY);
+		    		list.setFont(new Font("Tempus Sans ITC", Font.PLAIN, 18));
+		    		list.setBackground(Color.WHITE);
+		    		list.setBounds(60, 250, 570, 317);
+		    		list.setModel(listModel);
+		    		list.setSelectedIndex(-1);
+		            contentPane.add(list);
+		            contentPane.repaint();
+		        }
+		        finally {
+		            qexec.close();
+		        }
+
+			}
+		});
+		contentPane.setLayout(null);
+		btnSearchDoctor.setPreferredSize(new Dimension(350, 45));
+		contentPane.add(btnSearchDoctor);
+		
+		JLabel lblDoctorAndPlaces_1 = new JLabel("Search Doctor");
+		lblDoctorAndPlaces_1.setForeground(new Color(0, 128, 128));
+		lblDoctorAndPlaces_1.setFont(new Font("Sitka Small", Font.BOLD, 31));
+		lblDoctorAndPlaces_1.setBounds(212, 106, 270, 45);
+		contentPane.add(lblDoctorAndPlaces_1);
+		
+		txtByName = new JTextField();
+		txtByName.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		txtByName.setToolTipText("Enter Name");
+		txtByName.setBounds(100, 177, 355, 51);
+		contentPane.add(txtByName);
+		txtByName.setColumns(10);
+		
+		
+	
+		
+	}
+	
+	
+	
+}
+
+
+
+
+// (4) THIS CODE RETRIEVE INFORMATION ABOUT FACILITY (SUCH AS WARD AND BED)
+
+package hospital;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.util.FileManager;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDFS;
+
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.Dimension;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import java.awt.Font;
+import java.awt.SystemColor;
+import java.awt.Color;
+import java.awt.Toolkit;
+import java.awt.Button;
+import javax.swing.UIManager;
+import javax.swing.JTextField;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
+
+@SuppressWarnings("serial")
+public class SearchFacility extends JFrame {
+	
+	// Directory where we've stored the local data files, such as places.owl
+    public static final String SOURCE = "./src/main/hospital/SearchFacility/";
+
+    // Places ontology namespace
+    public static final String FACILITY_NS = "http://www.semanticweb.org/myontology#";
+    
+	private JPanel contentPane;
+	
+	//private ArrayList<String> arr = new ArrayList<String>();
+	
+    DefaultListModel listModel = new DefaultListModel();
+
+	/**
+	 * Launch the application.
+	 */
+	
+	public static SearchFacility facility_frame = new SearchFacility();
+	private JTextField txtByName;
+
+	public static void main(String[] args) {
+		
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					facility_frame.setVisible(true);
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public SearchFacility() {
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setFont(new Font("Arial", Font.PLAIN, 14));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("./src/main/image/hospitalimage.jpg"));
+		setTitle("Semantic Search");
+		setResizable(false);
+		setPreferredSize(new Dimension(800, 800));
+		setMaximumSize(new Dimension(800, 800));
+		setBounds(100, 100, 700, 700);
+		contentPane = new JPanel();
+		contentPane.setPreferredSize(new Dimension(700, 700));
+		contentPane.setMaximumSize(new Dimension(400, 400));
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		
+		
+		JButton btnSearchFacility = new JButton("Search");
+		btnSearchFacility.setBackground(SystemColor.controlHighlight);
+		btnSearchFacility.setFocusable(false);
+		btnSearchFacility.setFocusTraversalKeysEnabled(false);
+		btnSearchFacility.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		btnSearchFacility.setBounds(456, 177, 140, 51);
+		btnSearchFacility.setFocusPainted(false);
+		btnSearchFacility.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String name = txtByName.getText().toString().toLowerCase();
+				//create instance of OntModel class
+				OntModel m = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM );
+				
+				//read ontology model
+				FileManager.get().readModel( m, SOURCE + "places.owl" );
+				
+				String prefix = "prefix places: <" + FACILITY_NS + ">\n" +
+		                		"prefix rdfs: <" + RDFS.getURI() + ">\n" +
+		                		"prefix owl: <" + OWL.getURI() + ">\n";
+
+				String query_text=  prefix +
+							"select ?name where {?person a facility:Person ; " +
+							"                     facility:name ?name.\n";
+				
+				if(name != null && !name.isEmpty()) {
+						query_text += "FILTER(regex(str(?name),\""+name+"\",\"i\")) ";
+				}
+				query_text +=	"}" ; 
+				System.out.println(query_text);
+				
+				Query query = QueryFactory.create( query_text );
+		        QueryExecution qexec = QueryExecutionFactory.create( query, m );
+		    	
+		        listModel.removeAllElements();
+		        try {
+		            ResultSet results = qexec.execSelect();
+		            int i = 0;
+		            while ( results.hasNext() ) {
+		                QuerySolution qs = results.next();
+		               // arr.add(qs.get("name").toString());
+		                listModel.addElement(qs.get("name").toString());
+		                System.out.println(qs.get("name"));
+		                i++;
+		            }
+		          if(i == 0) {
+		        	  listModel.addElement("There was no match found for '"+name+"'");
+		          }
+		            //Create List
+		    		JList list = new JList();
+		    		list.setForeground(Color.DARK_GRAY);
+		    		list.setFont(new Font("Tempus Sans ITC", Font.PLAIN, 18));
+		    		list.setBackground(Color.WHITE);
+		    		list.setBounds(60, 250, 570, 317);
+		    		list.setModel(listModel);
+		    		list.setSelectedIndex(-1);
+		            contentPane.add(list);
+		            contentPane.repaint();
+		        }
+		        finally {
+		            qexec.close();
+		        }
+
+			}
+		});
+		contentPane.setLayout(null);
+		btnSearchFacility.setPreferredSize(new Dimension(350, 45));
+		contentPane.add(btnSearchFacility);
+		
+		JLabel lblFacilityAndhospital_1 = new JLabel("Search Facility");
+		lblFacilityAndhospital_1.setForeground(new Color(0, 128, 128));
+		lblFacilityAndhospital_1.setFont(new Font("Sitka Small", Font.BOLD, 31));
+		lblFacilityAndhospital_1.setBounds(212, 106, 270, 45);
+		contentPane.add(lblFacilityAndhospital_1);
+		
+		txtByName = new JTextField();
+		txtByName.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		txtByName.setToolTipText("Enter Name");
+		txtByName.setBounds(100, 177, 355, 51);
+		contentPane.add(txtByName);
+		txtByName.setColumns(10);
+		
+		
+	
+		
+	}
+}
