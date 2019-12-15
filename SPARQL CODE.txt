@@ -1,0 +1,179 @@
+ 
+// (1) THIS PROGRAM CODE RETRIEVE INFORMATON ABOUT PTIENT
+
+PREFIX hos: <http://www.semanticweb.org/myontology#>
+
+SELECT (str(?pid) as ?Patient_ID) (str(?fname) as ?First_name) (str(?lname) as ?Last_name) (str(?gnder) as ?Gender) (str(?dbirth) as ?date_of_birth) (str(?mnumber) as ?mobile_number)  (str(?paddres) as ?Patient_address)  (str(?emal) as ?Email) 
+	WHERE { 
+		?x a hos:patient.
+		?x hos:Patient_ID ?pid.
+		?x hos:First_name ?fname.
+		?x hos:Last_name ?lname.
+		?x hos:Gender ?gnder.
+		?x hos:date_of_birth ?dbirth.
+		?x hos:mobile_number ?mnumber.
+		?x hos:Patient_address ?paddres.
+		?x hos:Email ?emal.
+	}
+
+
+
+/ (2) THIS PROGRAM CODE RETRIEVE INFORMATON ABOUT DOCTOR
+
+PREFIX hos: <http://www.semanticweb.org/myontology#>
+
+SELECT (str(?Did) as ?dOCTOR_ID) (str(?fname) as ?First_name) (str(?lname) as ?Last_name) (str(?gnder) as ?Gender) (str(?dbirth) as ?date_of_birth) (str(?mnumber) as ?mobile_number)  (str(?paddres) as ?Patient_address)  (str(?emal) as ?Email) 
+	WHERE { 
+		?x a hos:Doctor.
+		?x hos:Doctor_ID ?did.
+		?x hos:First_name ?fname.
+		?x hos:Last_name ?lname.
+		?x hos:Gender ?gnder.
+		?x hos:date_of_birth ?dbirth.
+		?x hos:mobile_number ?mnumber.
+		?x hos:Patient_address ?daddres.
+		?x hos:Email ?emal.
+	}
+
+
+
+// (3) THIS CODE: A CONSULTANT MONITORS PATIENT  
+
+PREFIX hos: <http://www.semanticweb.org/myontology#>
+Select ?name  ?Lname ?dName ?LdName
+	where {
+		?consultant a hos:Consultant.
+        ?consultant hos:First_name ?dName.
+        ?consultant hos:Last_name ?LdName.
+		?consultant hos:monitor ?patient.
+  		?patient hos:First_name ?name.
+       ?patient hos:Last_name ?Lname.
+  FILTER(?dName="Abas" && ?LdName="Ntuen")
+   		
+  }
+
+
+
+// (4) CODE: DOCTOR TREATS PATIENTS
+
+PREFIX hos: <http://www.semanticweb.org/myontology#>
+
+
+Select ?PatientFirstName  ?PatientLastName ?SeniorDrFirstName ?SeniorDrLastName
+	where {
+		?seniordoctor a hos:seniordoctor.
+        ?seniordoctor hos:First_name ?SeniorDrFirstName.
+        ?seniordoctor hos:Last_name ?SeniorDrLastName.
+		?seniordoctor hos:treat ?patient.
+  		?patient hos:First_name ?PatientFirstName.
+       ?patient hos:Last_name ?PatientLastName.
+ 
+   		
+  }
+
+
+
+// (5) CODE: NURSE CARES FOR PATIENT
+
+PREFIX hos: <http://www.semanticweb.org/myontology#>
+
+
+Select ?PatientFirstName  ?PatientLastName ?SeniorDrFirstName ?SeniorDrLastName
+	where {
+		?nurse a hos:nurse.
+        ?nurse hos:First_name ?nurseFirstName.
+        ?seniordoctor hos:Last_name ?nurseLastName.
+		?nurse hos:cares ?patient.
+  		?patient hos:First_name ?PatientFirstName.
+       ?patient hos:Last_name ?PatientLastName.
+ 
+   		
+  }
+
+
+
+// (6) CODE: FILTER
+
+// SHOWS STUFENT WITH THE FILTER ID
+
+PREFIX uni: <http://www.semanticweb.org/myontology#>
+
+Select ?id ?firstname ?lastname ?gender ?dateofbirth ?address ?email ?mobilenumber 
+	where
+		{
+  		?Patient 	uni:Patient_ID ?id. 
+  		?Patient 	uni:First_name ?firstname.
+  		?Patient 	uni:Last_name ?lastname.
+  		?Patient	uni:Gender ?gender.
+  		?Patient	uni:date_of_birth ?dateofbirth.
+  		?Patient 	uni:Patient_address ?address.
+  		?Patient 	uni:Email ?email.
+  		?Patient	uni:mobile_number ?mobilenumber.
+ 
+
+
+FILTER(?id=347).
+  
+
+}
+
+
+
+
+
+// (7) CODE: LIMIT
+
+// RETRIEVE THE FIRST TWO INFORMATION
+
+PREFIX uni: <http://www.semanticweb.org/myontology#>
+
+Select ?id ?firstname ?lastname ?gender ?dateofbirth ?address ?email ?mobilenumber 
+	where
+		{
+  		?Patient 	uni:Patient_ID ?id. 
+  		?Patient 	uni:First_name ?firstname.
+  		?Patient 	uni:Last_name ?lastname.
+  		?Patient	uni:Gender ?gender.
+  		?Patient	uni:date_of_birth ?dateofbirth.
+  		?Patient 	uni:Patient_address ?address.
+  		?Patient 	uni:Email ?email.
+  		?Patient	uni:mobile_number ?mobilenumber.
+ 
+}
+
+LIMIT2
+  
+
+
+
+
+
+
+
+
+// (8) CODE: OFFSET
+
+// SKIP RWO PERSON BEFORE RETRIEVING THE INDORMATION
+
+PREFIX uni: <http://www.semanticweb.org/myontology#>
+
+Select ?id ?firstname ?lastname ?gender ?dateofbirth ?address ?email ?mobilenumber 
+	where
+		{
+  		?Patient 	uni:Patient_ID ?id. 
+  		?Patient 	uni:First_name ?firstname.
+  		?Patient 	uni:Last_name ?lastname.
+  		?Patient	uni:Gender ?gender.
+  		?Patient	uni:date_of_birth ?dateofbirth.
+  		?Patient 	uni:Patient_address ?address.
+  		?Patient 	uni:Email ?email.
+  		?Patient	uni:mobile_number ?mobilenumber.
+ 
+
+
+}
+
+OFFSET2
+
+
+
